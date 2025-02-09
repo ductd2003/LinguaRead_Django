@@ -1,0 +1,118 @@
+/* General Styles */
+body {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f7f8fc; /* Nền màu xám nhạt */
+  min-height: 100vh; /* Chiều cao tối thiểu bằng chiều cao của màn hình */
+  display: flex;
+  flex-direction: column; /* Đặt các phần tử con theo cột */
+}
+
+
+header {
+  background: linear-gradient(135deg, #182848, #4b6cb7);
+  color: #fff;
+  padding: 15px 0;
+  position: fixed;
+  width: 100%;
+  z-index: 1001;
+  top: 0;
+  left: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .logo {
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: #ffa500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  color: #ffa500;
+  font-size: 1.7rem;
+  cursor: pointer;
+}
+
+.nav-links {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 300px;
+  height: 100%;
+  background: linear-gradient(135deg, #4b6cb7, #182848);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  transition: right 0.4s ease-in-out;
+  z-index: 1000;
+  box-shadow: -4px 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.nav-links.active {
+  right: 0;
+}
+
+.nav-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links ul li {
+  margin-bottom: 20px;
+}
+
+.nav-links ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.nav-links ul li a:hover {
+  transform: scale(1.05);
+  color: #ffa500;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease-in-out;
+  z-index: 999;
+}
+
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+footer {
+  width: 100%; /* Đảm bảo footer bao phủ toàn bộ chiều ngang */
+  text-align: center;
+  padding: 15px;
+  background: #4b6cb7;
+  color: #fff;
+  box-sizing: border-box; /* Tính toán đúng kích thước khi thêm padding */
+}

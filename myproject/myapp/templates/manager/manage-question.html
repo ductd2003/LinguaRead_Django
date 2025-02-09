@@ -1,0 +1,166 @@
+{% extends "manager/base.html" %}
+
+{% block title %}Quản lý câu hỏi{% endblock %}
+
+{% block content %}
+<h1>Quản lý câu hỏi</h1>
+
+<!-- Form kiểm tra câu hỏi -->
+<h2>Kiểm tra câu hỏi</h2>
+<form id="check-questions-form">
+    {% csrf_token %}
+    <input type="text" name="check_post_content_id" placeholder="Nhập PostContent ID" required>
+    <button type="submit">Kiểm tra câu hỏi</button>
+</form>
+
+<!-- Khu vực hiển thị danh sách câu hỏi -->
+<div id="questions-list">
+    <p>Vui lòng kiểm tra câu hỏi để hiển thị danh sách.</p>
+</div>
+
+<!-- Form thêm câu hỏi mới -->
+<h2>Thêm câu hỏi</h2>
+<form id="add-question-form">
+    {% csrf_token %}
+    <label for="add_post_content_id">PostContent ID</label>
+    <input type="text" name="add_post_content_id" id="add_post_content_id" placeholder="Nhập PostContent ID" required><br>
+
+    <!-- QuillJS Editor for Question -->
+    <label for="question-editor">Câu hỏi</label>
+    <div id="question-editor" class="quill-editor"></div>
+    <input type="hidden" name="question_text" id="question-text">
+
+    <!-- Textarea for Answer -->
+    <label for="answer">Đáp án</label>
+    <textarea name="answer" id="answer" placeholder="Nhập đáp án" required></textarea>
+
+    <button type="submit">Lưu câu hỏi</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // 1. Khởi tạo Quill cho form thêm câu hỏi mới
+        const questionEditor = new Quill('#question-editor', {
+            theme: 'snow',
+            placeholder: 'Nhập câu hỏi...',
+        });
+
+        // 2. Xử lý khi form thêm câu hỏi được gửi
+        $('#add-question-form').on('submit', function (e) {
+            e.preventDefault(); // Ngăn form gửi theo cách thông thường
+
+            // Lấy nội dung từ trình soạn thảo Quill
+            const questionContent = questionEditor.root.innerHTML;
+
+            // Đặt nội dung vào input ẩn
+            $('#question-text').val(questionContent);
+
+            // Lấy PostContent ID từ input
+            const postContentId = $('#add_post_content_id').val();
+            if (!postContentId) {
+                alert('Vui lòng nhập PostContent ID!');
+                return;
+            }
+
+            // Gửi dữ liệu qua AJAX
+            $.ajax({
+                type: 'POST',
+                url: '{% url "question_manager" %}', // URL xử lý thêm câu hỏi
+                data: $(this).serialize(), // Serialize dữ liệu form
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message); // Hiển thị thông báo thành công
+                        $('#add-question-form')[0].reset(); // Reset form
+                        questionEditor.root.innerHTML = ''; // Xóa nội dung trong Quill
+                    } else {
+                        alert(response.error || 'Có lỗi xảy ra.'); // Hiển thị lỗi
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi khi gửi yêu cầu.'); // Xử lý lỗi kết nối
+                }
+            });
+        });
+
+        // Xử lý khi form kiểm tra câu hỏi được gửi
+$('#check-questions-form').on('submit', function (e) {
+    e.preventDefault(); // Ngăn form gửi theo cách thông thường
+
+    // Lấy dữ liệu từ form
+    const formData = $(this).serialize();
+
+    // Gửi AJAX request để kiểm tra câu hỏi
+    $.ajax({
+        type: 'POST',
+        url: '{% url "question_manager" %}', // URL xử lý kiểm tra câu hỏi
+        data: formData,
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                // Hiển thị danh sách câu hỏi trả về
+                $('#questions-list').html(response.html);
+
+                // Khởi tạo Quill cho từng câu hỏi trong danh sách
+                $('.quill-editor').each(function () {
+                    const editorElement = $(this);
+                    const questionId = editorElement.attr('id').replace('question-editor-', '');
+                    const currentQuestion = editorElement.attr('data-question'); // Lấy nội dung câu hỏi hiện tại
+
+                    // Khởi tạo Quill
+                    const quill = new Quill(editorElement[0], {
+                        theme: 'snow',
+                        placeholder: 'Nhập câu hỏi...',
+                    });
+
+                    // Đặt nội dung câu hỏi hiện tại vào Quill
+                    if (currentQuestion) {
+                        quill.root.innerHTML = currentQuestion;
+                    }
+
+                    // Xử lý khi form cập nhật câu hỏi được gửi
+                    $(`#update-question-form-${questionId}`).on('submit', function (e) {
+                        e.preventDefault();
+
+                        // Lấy nội dung từ Quill
+                        const questionContent = quill.root.innerHTML;
+
+                        // Đặt nội dung vào input ẩn
+                        $(`#hidden-question-${questionId}`).val(questionContent);
+
+                        // Gửi dữ liệu qua AJAX
+                        $.ajax({
+                            type: 'POST',
+                            url: '{% url "question_manager" %}', // URL xử lý cập nhật câu hỏi
+                            data: $(this).serialize(),
+                            dataType: 'json',
+                            success: function (response) {
+                                if (response.success) {
+                                    alert(response.message); // Hiển thị thông báo thành công
+                                } else {
+                                    alert(response.error || 'Có lỗi xảy ra.'); // Hiển thị lỗi
+                                }
+                            },
+                            error: function () {
+                                alert('Có lỗi khi gửi yêu cầu.'); // Xử lý lỗi kết nối
+                            }
+                        });
+                    });
+                });
+            } else {
+                // Hiển thị thông báo lỗi nếu không tìm thấy câu hỏi
+                $('#questions-list').html(`<p>${response.error || 'Không tìm thấy câu hỏi nào.'}</p>`);
+            }
+        },
+        error: function () {
+            // Xử lý lỗi kết nối hoặc server lỗi
+            $('#questions-list').html('<p>Có lỗi xảy ra. Vui lòng thử lại.</p>');
+        }
+    });
+});
+    });
+</script>
+{% endblock %}

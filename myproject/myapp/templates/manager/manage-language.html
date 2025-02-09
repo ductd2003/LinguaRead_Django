@@ -1,0 +1,133 @@
+<!-- templates/dashboard/languages.html -->
+{% extends 'manager/base.html' %}
+
+{% block title %}Manage Languages{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Languages</h1>
+    <button class="btn btn-success mb-3" id="addBtn">Add New Language</button>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Language Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="languagesTable">
+            {% for language in languages %}
+            <tr data-id="{{ language.languageid }}">
+                <td>{{ language.languageid }}</td>
+                <td>{{ language.languagename }}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm updateBtn">Update</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="languageForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="languageModalLabel">Add/Update Language</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="languageId">
+                    <div class="mb-3">
+                        <label for="languageName" class="form-label">Language Name</label>
+                        <input type="text" class="form-control" id="languageName" name="languagename" required>
+                    </div>
+                    <div id="formErrors" class="text-danger"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    // Add CSRF token to AJAX requests
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    $.ajaxSetup({
+        headers: { 'X-CSRFToken': csrftoken }
+    });
+
+    // Open Add Modal
+    $('#addBtn').click(function () {
+        $('#languageForm')[0].reset();
+        $('#languageId').val('');
+        $('#formErrors').text('');
+        $('#languageModalLabel').text('Add New Language');
+        $('#languageModal').modal('show');
+    });
+
+    // Open Update Modal
+    $('#languagesTable').on('click', '.updateBtn', function () {
+        const row = $(this).closest('tr');
+        const id = row.data('id');
+        const name = row.find('td:nth-child(2)').text();
+        $('#languageId').val(id);
+        $('#languageName').val(name);
+        $('#formErrors').text('');
+        $('#languageModalLabel').text('Update Language');
+        $('#languageModal').modal('show');
+    });
+
+    // Save Language
+    $('#languageForm').submit(function (e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+        $.post("{% url 'languages_save' %}", formData, function (response) {
+            if (response.status === 'success') {
+                if ($('#languageId').val()) {
+                    const row = $(`#languagesTable tr[data-id="${response.id}"]`);
+                    row.find('td:nth-child(2)').text(response.name);
+                } else {
+                    $('#languagesTable').append(`
+                        <tr data-id="${response.id}">
+                            <td>${response.id}</td>
+                            <td>${response.name}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm updateBtn">Update</button>
+                            </td>
+                        </tr>
+                    `);
+                }
+                $('#languageModal').modal('hide');
+            } else {
+                $('#formErrors').text(response.errors.languagename || 'An error occurred.');
+            }
+        }).fail(function () {
+            $('#formErrors').text('An error occurred while processing your request.');
+        });
+    });
+});
+</script>
+{% endblock %}

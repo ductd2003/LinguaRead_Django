@@ -1,0 +1,130 @@
+/* Layout chính */
+.layout {
+  display: flex;
+  margin-top: 80px;
+  flex: 1;
+}
+
+/* Nội dung chính */
+main {
+  flex: 1;
+}
+
+/* Khu vực bộ lọc và tìm kiếm */
+.search-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0;
+  padding: 15px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.filter-button {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  background: #4b6cb7;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.filter-button:hover {
+  background: #182848;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.search-bar button {
+  background: #4b6cb7;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-bar button:hover {
+  background: #182848;
+}
+
+/* Nội dung chính */
+.content-box {
+  gap: 15px;
+  margin: 20px 0;
+  padding: 15px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.content-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.content-body p {
+  flex: 2;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: auto;
+}
+
+.image-container {
+  flex-shrink: 0; /* Đảm bảo kích thước của ảnh không bị co lại */
+  width: 300px; /* Kích thước chiều rộng */
+  height: 300px; /* Chiều cao bằng chiều rộng để giữ hình vuông */
+  overflow: hidden; /* Ẩn phần ảnh vượt ra ngoài khung */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #f0f0f0;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Đảm bảo ảnh luôn lấp đầy khung và giữ tỷ lệ */
+  border-radius: 5px;
+}
+
+@media (max-width: 992px) {
+  .content-body {
+    flex-direction: column; /* Chuyển văn bản và ảnh thành hàng dọc */
+    align-items: flex-start;
+  }
+
+  .image-container {
+    width: 70%; /* Ảnh chiếm toàn bộ chiều rộng trên màn hình nhỏ */
+    height: auto; /* Tự động điều chỉnh chiều cao để giữ tỷ lệ */
+    margin: 0 auto;
+  }
+}

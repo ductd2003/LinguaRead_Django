@@ -1,0 +1,20 @@
+<!-- templates/dashboard/dashboard.html -->
+{% extends 'manager/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<header class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+</header>
+<div class="stats-container">
+    <div class="stat-box">
+        <h2>Tổng lượt xem</h2>
+        <p class="stat-value">{{ total_views }}</p>
+    </div>
+    <div class="stat-box">
+        <h2>Tổng bài viết</h2>
+        <p class="stat-value">{{ total_posts }}</p>
+    </div>
+</div>
+{% endblock %}

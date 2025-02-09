@@ -1,0 +1,135 @@
+<!-- templates/dashboard/dashboard.html -->
+{% extends 'manager/base.html' %}
+
+{% block title %}Manage post{% endblock %}
+
+{% block content %}
+<header class="dashboard-header">
+    <h1>Manage post</h1>
+</header>
+<div class="container mt-4">
+    <!-- Form tìm kiếm và nút tạo mới -->
+    <div class="d-flex justify-content-between mb-4">
+        <form method="GET" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search by Post ID" value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Create New Post</button>
+        </form>
+    </div>
+
+    <!-- Danh sách bài viết -->
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Post ID</th>
+                <th>Author</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in page_obj %}
+            <tr>
+                <td>{{ post.postid }}</td>
+                <td>{{ post.authorid_id }}</td>
+                <td>{{ post.status }}</td>
+                <td>{{ post.createdat|date:"d/m/Y" }}</td>
+                <td>{{ post.updatedat|date:"d/m/Y" }}</td>
+                <td>
+                    <!-- Hiển thị ảnh -->
+                    {% if post.image %}
+                        <img id="image-preview-{{ post.postid }}" src="data:image/png;base64,{{ post.image }}" alt="Post Image" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                    {% else %}
+                        <img id="image-preview-{{ post.postid }}" src="" alt="No Image" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                    {% endif %}
+                    <!-- Input upload -->
+                    <input type="file" id="image-upload-{{ post.postid }}" class="form-control mt-2" data-post-id="{{ post.postid }}" accept="image/*">
+                </td>
+                <td>
+                    {% if post.status == 'Draft' %}
+                        <a href="{% url 'publish_post' post.postid %}" class="btn btn-warning btn-sm">Publish</a>
+                    {% elif post.status == 'Published' %}
+                        <a href="{% url 'revert_to_draft' post.postid %}" class="btn btn-secondary btn-sm">Revert to Draft</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">No posts found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <script>
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function (event) {
+                const postId = this.getAttribute('data-post-id');
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        // Hiển thị ảnh preview
+                        document.getElementById(`image-preview-${postId}`).src = e.target.result;
+    
+                        // Gửi dữ liệu lên server
+                        const formData = new FormData();
+                        formData.append('image', file);
+    
+                        fetch(`/manager/update_image/${postId}/`, {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "X-CSRFToken": "{{ csrf_token }}",
+                            },
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                alert("Image uploaded and saved successfully!");
+                            } else {
+                                alert("Failed to upload the image.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            alert("An error occurred while uploading the image.");
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>     
+
+    <!-- Phân trang -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">&laquo; First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Last &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

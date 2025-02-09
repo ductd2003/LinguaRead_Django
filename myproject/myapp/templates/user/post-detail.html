@@ -1,0 +1,678 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Học ngoại ngữ với bài đọc: {{ post_description }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:title" content="{{ post_title }}" />
+    <meta property="og:description" content="{{ post_description }}" />
+    <meta property="og:image" content="data:image/png;base64,{{ post_image }}" />
+    <meta property="og:image:width" content="300" />
+    <meta property="og:image:height" content="300" />
+    <title>Responsive Blog Template</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+              /* General Styles */
+        body {
+          font-family: "Roboto", sans-serif;
+          margin: 0;
+          padding: 0;
+          background: #f7f8fc; /* Nền màu xám nhạt */
+          min-height: 100vh; /* Chiều cao tối thiểu bằng chiều cao của màn hình */
+          display: flex;
+          flex-direction: column; /* Đặt các phần tử con theo cột */
+        }
+
+
+        header {
+          background: linear-gradient(135deg, #182848, #4b6cb7);
+          color: #fff;
+          padding: 15px 0;
+          position: fixed;
+          width: 100%;
+          z-index: 1001;
+          top: 0;
+          left: 0;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header .container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        header .logo {
+          font-size: 1.7rem;
+          font-weight: bold;
+          color: #ffa500;
+          cursor: pointer;
+          user-select: none;
+        }
+
+        .menu-toggle {
+          background: none;
+          border: none;
+          color: #ffa500;
+          font-size: 1.7rem;
+          cursor: pointer;
+        }
+
+        .nav-links {
+          position: fixed;
+          top: 0;
+          right: -100%;
+          width: 300px;
+          height: 100%;
+          background: linear-gradient(135deg, #4b6cb7, #182848);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 20px;
+          transition: right 0.4s ease-in-out;
+          z-index: 1000;
+          box-shadow: -4px 0 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-links.active {
+          right: 0;
+        }
+
+        .nav-links ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        .nav-links ul li {
+          margin-bottom: 20px;
+        }
+
+        .nav-links ul li a {
+          color: #fff;
+          text-decoration: none;
+          font-size: 1.3rem;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: transform 0.2s ease, color 0.3s ease;
+        }
+
+        .nav-links ul li a:hover {
+          transform: scale(1.05);
+          color: #ffa500;
+        }
+
+        /* Overlay */
+        .overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.4s ease-in-out;
+          z-index: 999;
+        }
+
+        .overlay.active {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        footer {
+          width: 100%; /* Đảm bảo footer bao phủ toàn bộ chiều ngang */
+          text-align: center;
+          padding: 15px;
+          background: #4b6cb7;
+          color: #fff;
+          box-sizing: border-box; /* Tính toán đúng kích thước khi thêm padding */
+        }
+
+        /* Layout chính */
+.layout {
+  display: flex;
+  margin-top: 80px;
+  flex: 1;
+}
+
+/* Nội dung chính */
+main {
+  flex: 1;
+}
+
+/* Khu vực bộ lọc và tìm kiếm */
+.search-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0;
+  padding: 15px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.filter-button {
+  flex: 1;
+  padding: 10px;
+  background: #fff;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.search-bar button {
+  background: #4b6cb7;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-bar button:hover {
+  background: #182848;
+}
+
+/* Nội dung chính */
+.content-box {
+  position: relative;
+  gap: 15px;
+  margin: 20px 0;
+  padding: 15px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.content-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.content-body p {
+  flex: 2;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: auto;
+}
+
+.image-container {
+  flex-shrink: 0; /* Đảm bảo kích thước của ảnh không bị co lại */
+  width: 300px; /* Kích thước chiều rộng */
+  height: 300px; /* Chiều cao bằng chiều rộng để giữ hình vuông */
+  overflow: hidden; /* Ẩn phần ảnh vượt ra ngoài khung */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #f0f0f0;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Đảm bảo ảnh luôn lấp đầy khung và giữ tỷ lệ */
+  border-radius: 5px;
+}
+
+@media (max-width: 992px) {
+  .content-body {
+    flex-direction: column; /* Chuyển văn bản và ảnh thành hàng dọc */
+    align-items: flex-start;
+  }
+
+  .image-container {
+    width: 70%; /* Ảnh chiếm toàn bộ chiều rộng trên màn hình nhỏ */
+    height: auto; /* Tự động điều chỉnh chiều cao để giữ tỷ lệ */
+    margin: 0 auto;
+  }
+}
+
+/* Ô input trả lời */
+.input-field {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+/* Nút submit */
+.submit-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background: #4b6cb7;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.submit-button:hover {
+  background: #182848;
+}
+
+/* Tiêu đề phần câu hỏi */
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #182848;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Hiển thị đúng/sai bên cạnh ô input */
+.feedback-text {
+  font-size: 0.9rem;
+  margin-left: 10px;
+}
+
+/* Đúng */
+.feedback-text.correct {
+  color: green;
+  font-weight: bold;
+}
+
+/* Sai */
+.feedback-text.wrong {
+  color: red;
+  font-weight: bold;
+}
+
+/* Modal Popup */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* Nút reset */
+.reset-button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.reset-button:hover {
+  background: #d32f2f;
+}
+
+a {
+  text-decoration: none; /* Bỏ gạch chân */
+  color: inherit; /* Giữ lại màu chữ của phần tử cha */
+}
+
+.share-container {
+  position: absolute; /* Định vị tuyệt đối */
+  top: 5px; /* Khoảng cách từ cạnh trên */
+  right: 5px; /* Khoảng cách từ cạnh phải */
+  cursor: pointer;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  color: #4b6cb7;
+  text-decoration: none;
+  background: #f0f0f0;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.share-btn:hover {
+  background: #4b6cb7;
+  color: #fff;
+}
+
+    </style>
+
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <div class="container">
+        <div class="logo">
+          <a href="/" ><i class="fa-brands fa-readme"></i> LinguaRead</a>
+        </div>
+        <button class="menu-toggle" aria-label="Toggle menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sidebar Menu -->
+    <nav class="nav-links">
+      <ul>
+        <li>
+          <a href="{% url 'list-posts' %}"><i class="fas fa-home"></i> Trang chủ</a>
+        </li>
+        {% comment %} <li>
+          <a href="#"><i class="fa-solid fa-folder"></i> Thẻ ghi nhớ</a>
+        </li> {% endcomment %}
+        <li>
+          <a href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i> Giới thiệu</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="loading-spinner" id="loading-spinner"></div>
+
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Layout chính với Sidebar -->
+    <div class="layout">    
+        <!-- Nội dung chính -->
+        <main>
+            <!-- Khu vực bộ lọc và tìm kiếm -->
+            <div class='container'>
+                <div class="search-filter">
+                    <div class="filter-bar">
+                      <form method="get" id="filterForm">
+                        <input type="hidden" name="postId" value="{{ postId }}" >
+                        <select name="levelId" id="levelId" class="filter-button" onchange="document.getElementById('filterForm').submit();">
+                            {% for level in levels %}
+                            <option value="{{ level.levelid }}" {% if selected_level == level.levelid %}selected{% endif %}>
+                                {{ level.levelname }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    
+                        <select name="languageId" id="languageId" class="filter-button" onchange="document.getElementById('filterForm').submit();">
+                            {% for language in languages %}
+                            <option value="{{ language.languageid }}" {% if selected_language == language.languageid %}selected{% endif %}>
+                                {{ language.languagename }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </form>   
+                      <button class="filter-button" style="display: none">Bình luận</button>
+                    </div>
+                </div>
+            
+                <!-- Nội dung chính -->
+                <div class="content-box">
+                    <h2 class="content-title" style="text-align: center">{{ postcontent.title }}</h2>
+                    <div class="share-container">
+                      <a class="share-btn" onclick="handleShareClick(event)"
+                        ><i class="fas fa-share-alt"></i> Chia sẻ</a
+                      >
+                    </div>
+                    <div class="content-body">
+                        <div class="image-container">
+                          <img src="data:image/png;base64,{{ post_image }}" alt="Blog Image" />
+                        </div>
+                        <div>
+                          {{ postcontent.content|safe }}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="content-box">
+                  <h2 class="section-title">Câu hỏi</h2>
+                  {% if questions %}
+                      <ul id="questions-list" style="list-style: none; padding: 0;">
+                          {% for question in questions %}
+                              <li style="margin-bottom: 20px;">
+                                  <!-- Hiển thị câu hỏi -->
+                                  <p>{{ question.questiontext|safe }}</p>
+                                  
+                                  <!-- Ẩn đáp án -->
+                                  <input type="hidden" value="{{ question.answer }}" id="answer_{{ forloop.counter }}">
+              
+                                  <!-- Ô input để người dùng nhập đáp án -->
+                                  <div class="form-group">
+                                      <label for="user_answer_{{ forloop.counter }}" style="font-weight: bold;">Trả lời:</label><i> (Viết đầy đủ đáp án)</i>
+                                      <input 
+                                          type="text" 
+                                          id="user_answer_{{ forloop.counter }}" 
+                                          class="input-field" 
+                                          placeholder="Nhập đáp án của bạn"
+                                          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;"
+                                      >
+                                      <span id="feedback_{{ forloop.counter }}" class="feedback-text"></span>
+                                  </div>
+                              </li>
+                          {% endfor %}
+                      </ul>
+                      <div style="display: flex; justify-content: center; gap: 20px;">
+                        <button 
+                          onclick="submitAnswers()" 
+                          class="submit-button"
+                          style="display: block; margin: 20px auto; padding: 10px 20px; background: #4b6cb7; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; transition: background 0.3s ease;"
+                      >
+                          Nộp bài
+                      </button>
+                      <button 
+                          onclick="resetForm()" 
+                          class="reset-button"
+                          style="display: block; margin: 20px auto; padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; transition: background 0.3s ease;"
+                      >
+                          Làm lại
+                      </button>
+                      </div>
+                      <div id="result" style="margin-top: 20px;"></div>
+                  {% else %}
+                      <p>Không có câu hỏi nào liên quan đến bài viết này.</p>
+                  {% endif %}
+              </div>
+              
+              <!-- Modal Popup -->
+              <div id="result-modal" class="modal">
+                  <div class="modal-content">
+                      <span class="close-btn" onclick="closeModal()">&times;</span>
+                      <p id="modal-text"></p>
+                  </div>
+              </div>
+                           
+            </div>
+
+        </main>
+    </div>
+
+    <footer>
+      <p>&copy; 2024 Blog Template - Tất cả quyền được bảo vệ.</p>
+    </footer>
+
+    <script>
+      function submitAnswers() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = ""; // Xóa kết quả cũ
+        let correctCount = 0;
+        let totalCount = 0;
+    
+        // Lấy danh sách các câu hỏi
+        const questionsList = document.getElementById('questions-list');
+        const questions = questionsList.querySelectorAll('li');
+    
+        // Duyệt qua từng câu hỏi
+        questions.forEach((question, index) => {
+            const correctAnswerElem = document.getElementById(`answer_${index + 1}`);
+            const userAnswerElem = document.getElementById(`user_answer_${index + 1}`);
+            const feedbackSpan = document.getElementById(`feedback_${index + 1}`);
+            
+            // Kiểm tra nếu các phần tử có tồn tại
+            if (correctAnswerElem && userAnswerElem) {
+                const correctAnswer = correctAnswerElem.value.trim().toLowerCase();
+                const userAnswer = userAnswerElem.value.trim().toLowerCase();
+    
+                totalCount++;
+    
+                if (userAnswer === correctAnswer) {
+                    correctCount++;
+                    feedbackSpan.textContent = "Đúng!";
+                    feedbackSpan.className = "feedback-text correct";
+                } else {
+                    feedbackSpan.textContent = `Sai! Đáp án đúng: ${correctAnswer}`;
+                    feedbackSpan.className = "feedback-text wrong";
+                }
+            } else {
+                console.error(`Không tìm thấy phần tử cho câu hỏi ${index + 1}`);
+            }
+        });
+    
+        // Hiển thị modal với kết quả
+        showModal(correctCount, totalCount);
+    }
+    
+  
+      function resetForm() {
+          // Xóa tất cả nội dung trong ô input
+          const inputs = document.querySelectorAll('.input-field');
+          inputs.forEach(input => {
+              input.value = "";
+          });
+  
+          // Xóa feedback
+          const feedbacks = document.querySelectorAll('.feedback-text');
+          feedbacks.forEach(feedback => {
+              feedback.textContent = "";
+              feedback.className = "feedback-text"; // Xóa class màu xanh/đỏ
+          });
+  
+          // Ẩn modal (nếu đang mở)
+          closeModal();
+      }
+  
+      function showModal(correct, total) {
+          const modal = document.getElementById('result-modal');
+          const modalText = document.getElementById('modal-text');
+          modalText.textContent = `Bạn đã trả lời đúng ${correct}/${total} câu.`;
+          modal.style.display = "block";
+      }
+  
+      function closeModal() {
+          const modal = document.getElementById('result-modal');
+          modal.style.display = "none";
+      }
+  
+      // Đóng modal khi click ngoài vùng modal
+      window.onclick = function(event) {
+          const modal = document.getElementById('result-modal');
+          if (event.target === modal) {
+              modal.style.display = "none";
+          }
+      }
+  </script>
+  
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const menuToggle = document.querySelector(".menu-toggle");
+        const navLinks = document.querySelector(".nav-links");
+        const overlay = document.querySelector(".overlay");
+    
+        // Toggle menu khi nhấn nút hamburger
+        menuToggle.addEventListener("click", () => {
+            navLinks.classList.toggle("active");
+            overlay.classList.toggle("active");
+        });
+    
+        // Ẩn menu khi nhấn overlay
+        overlay.addEventListener("click", () => {
+            navLinks.classList.remove("active");
+            overlay.classList.remove("active");
+        });
+    });
+    </script>
+    <script>
+      function handleShareClick(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    
+        // Truyền thông tin từ Django vào JavaScript
+        const title = "{{ post_title }}"; // Tiêu đề bài viết
+        const description = "{{ post_description }}"; // Mô tả bài viết
+        const image = "data:image/png;base64,{{ post_image }}"; // Hình ảnh bài viết
+    
+        // Lấy URL hiện tại và thêm các tham số vào URL
+        const Url = window.location.href;
+    
+        // Chia sẻ bài viết lên Facebook với URL và các tham số
+        const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(Url)}&quote=${encodeURIComponent(description)}&title=${encodeURIComponent(title)}&image=${encodeURIComponent(image)}`;
+    
+        // Mở cửa sổ chia sẻ Facebook
+        window.open(facebookShareUrl, '_blank', 'width=600,height=400');
+      }
+    </script>
+  </body>
+</html>

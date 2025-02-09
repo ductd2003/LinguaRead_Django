@@ -1,0 +1,162 @@
+<!-- templates/dashboard/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+    <style>
+        /* General Reset */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .sidebar-header h2 {
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-menu a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: #495057;
+        }
+
+        .logout-link {
+            background-color: #dc3545;
+            text-align: center;
+            margin-top: auto;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .logout-link:hover {
+            background-color: #c82333;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            margin-bottom: 20px;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .stat-box h2 {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            .stats-container {
+                flex-direction: column;
+            }
+            .stat-box {
+                margin: 10px 0;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Menu</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="/manager/manage-post">Bài viết</a></li>
+                <li><a href="/manager/manage-postcontent">Bài viết chi tiết</a></li>
+                <li><a href="/manager/manage-level">Cấp độ</a></li>
+                <li><a href="/manager/manage-language">Ngôn ngữ</a></li>
+                <li><a href="/manager/manage-question">Câu hỏi</a></li>
+                <li><a href="{% url 'admin_logout' %}" class="logout-link">Đăng xuất</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,57 @@
+# 🛑 Loại bỏ môi trường ảo (venv, virtualenv)
+venv/
+env/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+
+# 🛑 Ignore file môi trường
+.env
+.env.local
+.env.production
+*.secrets
+
+# 🛑 Ignore log & temp files
+*.log
+*.pot
+*.swp
+*.swo
+*.swn
+*.DS_Store
+*.bak
+*.tmp
+*.~lock.*
+*.~undo-tree*
+*.pid
+*.orig
+
+# 🛑 Ignore IDE và editor files
+.vscode/
+.idea/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# 🛑 Ignore thư mục build, static, media
+staticfiles/
+media/
+node_modules/
+dist/
+build/
+coverage/
+*.cover
+.pytest_cache/
+.tox/
+htmlcov/
+
+# 🛑 Ignore file dịch thuật
+*.mo
+*.pot
+
+# 🛑 Ignore gunicorn & supervisord logs (nếu deploy)
+gunicorn.log
+supervisord.log

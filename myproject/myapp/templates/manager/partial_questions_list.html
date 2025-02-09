@@ -1,0 +1,26 @@
+<div id="questions-list">
+    {% if questions %}
+        <h2>Danh sách câu hỏi</h2>
+        <ul>
+            {% for question in questions %}
+                <li>
+                    <form id="update-question-form-{{ question.questionid }}" class="update-question-form" data-question-id="{{ question.questionid }}">
+                        {% csrf_token %}
+                        <strong>Câu hỏi:</strong>
+                        <!-- Thêm thuộc tính data-question để lưu trữ nội dung câu hỏi hiện tại -->
+                        <div id="question-editor-{{ question.questionid }}" class="quill-editor" data-question="{{ question.questiontext }}"></div>
+                        <input type="hidden" name="update_question_id" value="{{ question.questionid }}">
+                        <input type="hidden" name="question_text" id="hidden-question-{{ question.questionid }}">
+                        
+                        <strong>Đáp án:</strong>
+                        <input type="text" name="answer" value="{{ question.answer }}" required><br>
+                        
+                        <button type="submit">Cập nhật</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Không có câu hỏi nào.</p>
+    {% endif %}
+</div>
