@@ -438,7 +438,7 @@ a {
                   <h3>
                     {{ post.selected_postcontent.title|truncatewords:10 }}
                   </h3>
-                  {{ post.selected_postcontent.content|truncatewords:20|safe }}
+                  {{ post.selected_postcontent.content|truncatechars:100|safe }}
                   <p class="meta">
                     <i class="fas fa-clock"></i> {{ post.createdat|date:"j/n/Y" }}
                   </p>
