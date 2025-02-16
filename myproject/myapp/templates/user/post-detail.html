@@ -572,17 +572,18 @@ a {
             
             // Kiểm tra nếu các phần tử có tồn tại
             if (correctAnswerElem && userAnswerElem) {
-                const correctAnswer = correctAnswerElem.value.trim().toLowerCase();
+                const correctAnswerRaw = correctAnswerElem.value.trim().toLowerCase();
                 const userAnswer = userAnswerElem.value.trim().toLowerCase();
     
                 totalCount++;
-    
+                const correctAnswer = correctAnswerRaw.replace(/\s*\(.*?\)\s*$/, '');
+
                 if (userAnswer === correctAnswer) {
                     correctCount++;
                     feedbackSpan.textContent = "Đúng!";
                     feedbackSpan.className = "feedback-text correct";
                 } else {
-                    feedbackSpan.textContent = `Sai! Đáp án đúng: ${correctAnswer}`;
+                    feedbackSpan.textContent = `Sai! Đáp án đúng: ${correctAnswerRaw}`;
                     feedbackSpan.className = "feedback-text wrong";
                 }
             } else {

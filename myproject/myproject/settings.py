@@ -15,7 +15,12 @@ SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret-key")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 # Đọc ALLOWED_HOSTS từ .env (nếu thiếu, mặc định là localhost)
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,linguaread.com,www.linguaread.com").split(",")
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://linguaread.com",
+    "https://www.linguaread.com",
+]
 
 # **QUAN TRỌNG: Cần có INSTALLED_APPS đầy đủ**
 INSTALLED_APPS = [
@@ -42,7 +47,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME', 'LinguaRead'),
         'USER': os.getenv('DB_USER', 'root'),
-        'PASSWORD': os.getenv('DB_PASSWORD', '123456'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'My$ecure123'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '3306'),  # Nếu không có giá trị trong .env, mặc định là 3306
         'OPTIONS': {
@@ -50,7 +55,6 @@ DATABASES = {
         },
     }
 }
-
 # Cấu hình Redis Cache từ .env
 CACHES = {
     'default': {
@@ -60,18 +64,19 @@ CACHES = {
 }
 
 # Định nghĩa WSGI
-WSGI_APPLICATION = 'myproject.wsgi.application'
+WSGI_APPLICATION = 'myproject.myproject.wsgi.application'
 
 # Định nghĩa MIDDLEWARE (để Django hoạt động đúng)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware'
 ]
+
 
 # Định nghĩa templates
 TEMPLATES = [
