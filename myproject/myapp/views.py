@@ -12,7 +12,8 @@ from types import SimpleNamespace
 import base64
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
-
+import re
+from django.utils.html import mark_safe
 
 
 
@@ -333,7 +334,8 @@ def user_posts_list(request):
     )
 
     posts = Posts.objects.filter(
-        postid__in=postcontents.values('postid')
+        postid__in=postcontents.values('postid'),
+        status='Published'
     ).order_by('-createdat')
 
     # Lấy Postcontent tương ứng với languageid và levelid đã chọn
@@ -375,10 +377,39 @@ def user_post_detail(request):
             languageid_id=language_id
         )
         post = Posts.objects.get(postid=post_id)
-        post_image = post.image  # Lấy trường image từ model Posts
-        post_title = postcontent.title  # Tiêu đề bài viết
-        post_description = postcontent.content[:150]  # Mô tả bài viết (cắt ngắn 150 ký tự nếu cần)
+        post_image = post.image
+        post_title = postcontent.title
+        post_description = postcontent.content[:150]
+
+        # Lấy danh sách câu hỏi
         questions = Questions.objects.filter(postcontentid=postcontent)
+
+        processed_questions = []
+        for question in questions:
+            question_html = question.questiontext  # Giữ nguyên HTML
+
+            # Tìm vị trí của phần đáp án (sau "::::")
+            split_match = re.search(r'(.*?)<p>::::(.+)</p>', question_html, re.DOTALL)
+            
+            if split_match:
+                question_text = split_match.group(1).strip()  # Giữ nguyên phần câu hỏi (HTML)
+                answers_text = split_match.group(2).strip()  # Lấy danh sách đáp án
+
+                # Tách đáp án bằng "::::" và giữ nguyên định dạng
+                answer_list = [ans.strip() for ans in answers_text.split("::::")]
+
+                processed_questions.append({
+                    "question": mark_safe(question_text),  # Giữ nguyên HTML
+                    "answers": answer_list,
+                    "answer": question.answer
+                })
+            else:
+                # Nếu không tìm thấy "::::", giữ nguyên question_html
+                processed_questions.append({
+                    "question": mark_safe(question_html),
+                    "answers": [],
+                    "answer": question.answer
+                })
 
     except Postcontent.DoesNotExist:
         postcontent = SimpleNamespace(
@@ -387,9 +418,9 @@ def user_post_detail(request):
         )
         post = Posts.objects.get(postid=post_id)
         post_image = post.image
-        post_title = 'Bài viết không tồn tại'  # Nếu không tìm thấy bài viết
+        post_title = 'Bài viết không tồn tại'
         post_description = 'Bài viết bạn đang tìm không tồn tại hoặc đã bị xóa.'
-        questions = []
+        processed_questions = []
 
     levels, languages = get_levels_and_languages()
 
@@ -403,8 +434,9 @@ def user_post_detail(request):
         'post_image': post_image,
         'post_title': post_title,
         'post_description': post_description,
-        'questions': questions
+        'questions': processed_questions
     })
+
 
 def about_us(request):
     return render(request, "user/about-us.html")

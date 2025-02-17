@@ -491,28 +491,29 @@ a {
                   <h2 class="section-title">Câu hỏi</h2>
                   {% if questions %}
                       <ul id="questions-list" style="list-style: none; padding: 0;">
-                          {% for question in questions %}
-                              <li style="margin-bottom: 20px;">
-                                  <!-- Hiển thị câu hỏi -->
-                                  <p>{{ question.questiontext|safe }}</p>
-                                  
-                                  <!-- Ẩn đáp án -->
-                                  <input type="hidden" value="{{ question.answer }}" id="answer_{{ forloop.counter }}">
-              
-                                  <!-- Ô input để người dùng nhập đáp án -->
-                                  <div class="form-group">
-                                      <label for="user_answer_{{ forloop.counter }}" style="font-weight: bold;">Trả lời:</label>
-                                      <input 
-                                          type="text" 
-                                          id="user_answer_{{ forloop.counter }}" 
-                                          class="input-field" 
-                                          placeholder="Nhập đáp án của bạn"
-                                          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;"
-                                      >
-                                      <span id="feedback_{{ forloop.counter }}" class="feedback-text"></span>
-                                  </div>
-                              </li>
-                          {% endfor %}
+                        {% for question in questions %}
+                        <li style="margin-bottom: 20px;">
+                            <!-- Hiển thị câu hỏi -->
+                            <p>{{ question.question|safe }}</p>
+                
+                            <!-- Ẩn đáp án đúng -->
+                            <input type="hidden" value="{{ question.answer }}" id="answer_{{ forloop.counter }}">
+                
+                            <!-- Hiển thị các lựa chọn dưới dạng radio button -->
+                            <div class="form-group">
+                                {% for answer in question.answers %}
+                                    <label>
+                                        <input 
+                                            type="checkbox" 
+                                            name="question_{{ forloop.counter }}" 
+                                            value="{{ answer }}"
+                                        > {{ answer }}
+                                    </label><br>
+                                {% endfor %}
+                            </div>
+                            <span id="feedback_{{ forloop.counter }}" class="feedback-text"></span>
+                        </li>
+                    {% endfor %}
                       </ul>
                       <div style="display: flex; justify-content: center; gap: 20px;">
                         <button 
@@ -567,33 +568,57 @@ a {
         // Duyệt qua từng câu hỏi
         questions.forEach((question, index) => {
             const correctAnswerElem = document.getElementById(`answer_${index + 1}`);
-            const userAnswerElem = document.getElementById(`user_answer_${index + 1}`);
             const feedbackSpan = document.getElementById(`feedback_${index + 1}`);
             
-            // Kiểm tra nếu các phần tử có tồn tại
-            if (correctAnswerElem && userAnswerElem) {
-                const correctAnswerRaw = correctAnswerElem.value.trim().toLowerCase();
-                const userAnswer = userAnswerElem.value.trim().toLowerCase();
+            // Lấy tất cả checkbox trong câu hỏi
+            const checkboxes = question.querySelectorAll('input[type="checkbox"]');
+            const correctAnswers = correctAnswerElem.value.trim().toLowerCase(); // Đáp án đúng là một chuỗi đơn giản
     
-                totalCount++;
-                const correctAnswer = correctAnswerRaw.replace(/\s*\(.*?\)\s*$/, '');
-
-                if (userAnswer === correctAnswer) {
+            let userAnswers = [];
+            checkboxes.forEach((checkbox) => {
+                if (checkbox.checked) {
+                    userAnswers.push(checkbox.value.trim().toLowerCase()); // Thêm đáp án người dùng chọn vào mảng
+                }
+            });
+    
+            totalCount++;
+    
+            // Kiểm tra nếu chỉ có 1 đáp án đúng (không có dấu phân cách)
+            if (correctAnswers.indexOf(",") === -1) {
+                // Trường hợp chỉ có 1 đáp án đúng
+                const isCorrect = userAnswers.length === 1 && userAnswers[0] === correctAnswers;
+    
+                if (isCorrect) {
                     correctCount++;
                     feedbackSpan.textContent = "Đúng!";
                     feedbackSpan.className = "feedback-text correct";
                 } else {
-                    feedbackSpan.textContent = `Sai! Đáp án đúng: ${correctAnswerRaw}`;
+                    feedbackSpan.textContent = `Sai! Đáp án đúng: ${correctAnswers}`;
                     feedbackSpan.className = "feedback-text wrong";
                 }
             } else {
-                console.error(`Không tìm thấy phần tử cho câu hỏi ${index + 1}`);
+                // Trường hợp có nhiều đáp án đúng
+                const correctAnswersArray = correctAnswers.split(',').map(answer => answer.trim().toLowerCase());
+                const userAnswersSorted = userAnswers.sort();
+                const correctAnswersSorted = correctAnswersArray.sort();
+                
+                const isCorrect = JSON.stringify(userAnswersSorted) === JSON.stringify(correctAnswersSorted);
+    
+                if (isCorrect) {
+                    correctCount++;
+                    feedbackSpan.textContent = "Đúng!";
+                    feedbackSpan.className = "feedback-text correct";
+                } else {
+                    feedbackSpan.textContent = `Sai! Đáp án đúng: ${correctAnswersArray.join(", ")}`;
+                    feedbackSpan.className = "feedback-text wrong";
+                }
             }
         });
     
         // Hiển thị modal với kết quả
         showModal(correctCount, totalCount);
     }
+       
     
   
       function resetForm() {
